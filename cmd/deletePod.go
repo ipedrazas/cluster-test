@@ -41,10 +41,16 @@ func init() {
 	rootCmd.AddCommand(deletePodCmd)
 	deletePodCmd.Flags().StringVarP(&filter, "filter", "f", "", "label selector to fetch pods. Format is: key=value")
 	deletePodCmd.Flags().StringVarP(&namespace, "namespace", "n", "default", "Namespace where the resources are located")
+	deletePodCmd.Flags().StringVarP(&namespace, "namespace", "n", "default", "Namespace where the resources are located")
 }
 
 func podsHandler(cmd *cobra.Command, args []string) {
-	config = outCluster()
+	if incluster {
+		config = inCluster()
+	}else{
+		config = outCluster()
+	}
+	
 	pods := getPods()
 	deletePod(pods)
 }

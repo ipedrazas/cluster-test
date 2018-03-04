@@ -29,6 +29,7 @@ var dryrun bool
 var all bool
 var cluster string
 var wait int
+var incluster bool
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -77,6 +78,7 @@ func init() {
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	rootCmd.PersistentFlags().BoolVar(&dryrun, "dry-run", false, "do a dry-run execution")
+	rootCmd.PersistentFlags().BoolVar(&incluster, "in-cluster", false, "flag that indicates if the execution happens inside or outside a kubernetes cluster.")
 	rootCmd.PersistentFlags().BoolVar(&all, "all", false, "tries to delete all the resources")
 	rootCmd.PersistentFlags().StringVar(&cluster, "cluster", "c", "kubernetes cluster name")
 	rootCmd.PersistentFlags().IntVarP(&wait, "wait", "d", 0, "delay between deletion of resources")
