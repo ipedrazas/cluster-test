@@ -1,2 +1,3 @@
 # cluster-test
-testing cluster
+
+Application to test cluster configurations and cluster recoveries.
