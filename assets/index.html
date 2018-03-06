@@ -1,27 +1,41 @@
 <html>
     <head>
         <title>Cluster Test</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://unpkg.com/tachyons@4.9.1/css/tachyons.min.css"/>
         <link href="app.css" rel="stylesheet" type="text/css">
     </head>
 <body>
     <h1>Cluster Test</h1>
     <div id="app">
 
-        <div v-for="inst in instances">
-            <div class="component">
-                    <p>{{ inst.ID }} is: {{ inst.State }}</p>
-                    <p>Private IP: {{inst.PrivateIP}} </p>
-                    <p>Public IP: {{ inst.PublicIP }}</p>
-                    <p>Is Master? {{ inst.IsMaster }}</p>
-                    <div> 
-                        Route 53 bindings:
-                        <ul v-for="dns in inst.DNS">
-                            <li>{{ dns }} </li>
-                        </ul>
+
+            <div class="dt-ns dt--fixed-ns">
+                    <div class="fl w-20 pa2 bg-black-0">
+                      
                     </div>
-            </div>
+                    <div class="fl w-60 pa2 bg-lightest-blue">
+                            <div v-for="inst in instances">
+                                    <div class="ba component">
+                                            <p><strong>{{ inst.ID }}</strong> is: <span :class="inst.State">{{ inst.State }}</span></p>
+                                            <p>Private IP: {{inst.PrivateIP}}  -- Public IP: {{ inst.PublicIP }}</p>
+                                            <p>Is Master? {{ inst.IsMaster }}</p>
+                                            <div :id="inst.ID"> 
+                                                Route 53 bindings:
+                                                <ul v-for="dns in inst.DNS">
+                                                    <li>{{ dns }} </li>
+                                                </ul>
+                                            </div>
+                                    </div>
+                                
+                                </div>        
+                    </div>
+                    <div class="fl w-20 pa2 bg-black-0">
+                      
+                    </div>
+                  </div>
+
         
-        </div>        
     </div>
 
     

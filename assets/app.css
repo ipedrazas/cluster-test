@@ -1,11 +1,17 @@
-.running{
-    color: aquamarine;
-    background-color: chartreuse;
-}
+
 
 .component{
-    border: 1px black solid;
+    
     padding-left: 35px;
     padding-bottom: 15px;
     margin-bottom: 25px;
+    border-color: #408BC9;
+}
+
+.running{
+    color: #085208;
+    font-weight: bold;
+    background-color: #d3f9d3;
+    padding: 5px;
+    text-transform: capitalize;
 }
