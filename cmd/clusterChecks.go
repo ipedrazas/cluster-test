@@ -57,6 +57,7 @@ func MastersCheckHandler(w http.ResponseWriter, r *http.Request) {
 	result := &CheckResult{
 		Instances: instances,
 		Route53:   dns,
+		Cluster:   cluster,
 	}
 	w.Header().Set("Content-Type", "application/json")
 

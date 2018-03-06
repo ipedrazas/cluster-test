@@ -24,4 +24,5 @@ type Instance struct {
 type CheckResult struct {
 	Instances []Instance
 	Route53   []RR
+	Cluster   string
 }

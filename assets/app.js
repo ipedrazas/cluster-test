@@ -2,7 +2,8 @@ var app = new Vue({
     el: '#app',
     data: {
     //   message: 'Hello',
-      instances: [{ID: '123', Status: 'runnning'}]
+      instances: [{ID: '123', Status: 'runnning'}],
+      cluster: ""
     },
     methods: {
       getData() {
@@ -14,6 +15,7 @@ var app = new Vue({
             console.log(response.body.Instances);
             
             app.instances = response.body.Instances;
+            app.cluster = response.body.Cluster;
         
           }, response => {
               

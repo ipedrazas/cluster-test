@@ -8,6 +8,16 @@
     border-color: #408BC9;
 }
 
+.clusterHeader{
+    color: white;
+    text-align: center;
+    font-size: larger;
+    font-weight: bolder;
+    padding: 20px;
+    background-color: #35558e;
+    margin: 0;
+}
+
 .running{
     color: #085208;
     font-weight: bold;

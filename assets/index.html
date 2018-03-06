@@ -15,10 +15,11 @@
                       
                     </div>
                     <div class="fl w-60 pa2 bg-lightest-blue">
+                            <div class="clusterHeader">{{ cluster }}</div>
                             <div v-for="inst in instances">
                                     <div class="ba component">
                                             <p><strong>{{ inst.ID }}</strong> is: <span :class="inst.State">{{ inst.State }}</span></p>
-                                            <p>Private IP: {{inst.PrivateIP}}  -- Public IP: {{ inst.PublicIP }}</p>
+                                            <p><strong>Private IP:</strong> {{inst.PrivateIP}}  -- <strong>Public IP:</strong> {{ inst.PublicIP }}</p>
                                             <p>Is Master? {{ inst.IsMaster }}</p>
                                             <div :id="inst.ID"> 
                                                 Route 53 bindings:
