@@ -33,6 +33,7 @@ var incluster bool
 var debug bool
 var version = "v0.1.0"
 var deletedResources []string
+var zoneId string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -85,6 +86,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&incluster, "in-cluster", false, "flag that indicates if the execution happens inside or outside a kubernetes cluster.")
 	rootCmd.PersistentFlags().BoolVar(&all, "all", false, "tries to delete all the resources")
 	rootCmd.PersistentFlags().StringVar(&cluster, "cluster", "c", "kubernetes cluster name")
+	rootCmd.PersistentFlags().StringVar(&zoneId, "zoneId", "z", "AWS route53 zoneID")
 	rootCmd.PersistentFlags().IntVarP(&wait, "wait", "d", 0, "delay between deletion of resources")
 	rootCmd.AddCommand(versionCmd)
 

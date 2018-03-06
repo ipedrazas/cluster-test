@@ -57,6 +57,7 @@ func initHTTPServer(cmd *cobra.Command, args []string) {
 	r.HandleFunc("/pods/{namespace}/{filter}", PodsHandler)
 	r.HandleFunc("/nodes/{cluster}/{all}", NodesHandler)
 	r.HandleFunc("/master/{cluster}/{all}", MastersHandler)
+	r.HandleFunc("/check/master/{cluster}", MastersCheckHandler)
 	http.Handle("/", r)
 	listenPort := fmt.Sprintf(":%v", strconv.Itoa(port))
 	http.ListenAndServe(listenPort, r)
@@ -66,4 +67,5 @@ func initHTTPServer(cmd *cobra.Command, args []string) {
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, "cluster test %v", version)
+	lookupAPIServer()
 }

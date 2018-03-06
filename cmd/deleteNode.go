@@ -50,10 +50,10 @@ func runNode(cmd *cobra.Command, args []string) {
 func deleteNode() error {
 	deletedResources = nil
 	fmt.Printf("delete node from cluster %v", cluster)
-	nodes := GetNodes(cluster)
+	nodes := GetNodes()
 	if all {
 		for _, n := range nodes {
-			d, err := deleteInstance(n)
+			d, err := deleteInstance(n.ID)
 			if err != nil {
 				return err
 			}
@@ -66,7 +66,7 @@ func deleteNode() error {
 		s := rand.NewSource(time.Now().Unix())
 		r := rand.New(s)
 		unluckyNode := nodes[r.Intn(len(nodes))]
-		d, err := deleteInstance(unluckyNode)
+		d, err := deleteInstance(unluckyNode.ID)
 		if err != nil {
 			return err
 		}

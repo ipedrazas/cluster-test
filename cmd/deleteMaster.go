@@ -51,10 +51,10 @@ func runMaster(cmd *cobra.Command, args []string) {
 func deleteMaster() error {
 	deletedResources = nil
 	fmt.Printf("delete master from cluster %v", cluster)
-	masters := GetMasters(cluster)
+	masters := GetMasters()
 	if all {
 		for _, m := range masters {
-			d, err := deleteInstance(m)
+			d, err := deleteInstance(m.ID)
 			if err != nil {
 				return err
 			}
@@ -67,7 +67,7 @@ func deleteMaster() error {
 		s := rand.NewSource(time.Now().Unix())
 		r := rand.New(s)
 		unluckyMaster := masters[r.Intn(len(masters))]
-		d, err := deleteInstance(unluckyMaster)
+		d, err := deleteInstance(unluckyMaster.ID)
 		if err != nil {
 			return err
 		}
