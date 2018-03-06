@@ -53,19 +53,20 @@ func init() {
 func initHTTPServer(cmd *cobra.Command, args []string) {
 	r := mux.NewRouter()
 
-	r.HandleFunc("/", HomeHandler)
+	// r.HandleFunc("/", HomeHandler)
 	r.HandleFunc("/pods/{namespace}/{filter}", PodsHandler)
 	r.HandleFunc("/nodes/{cluster}/{all}", NodesHandler)
 	r.HandleFunc("/master/{cluster}/{all}", MastersHandler)
 	r.HandleFunc("/check/master/{cluster}", MastersCheckHandler)
+	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./assets/")))).Methods("GET")
+	r.NotFoundHandler = http.HandlerFunc(NotFoundHandler)
+
 	http.Handle("/", r)
 	listenPort := fmt.Sprintf(":%v", strconv.Itoa(port))
 	http.ListenAndServe(listenPort, r)
 }
 
-// HomeHandler is the default route
-func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "cluster test %v", version)
-	lookupAPIServer()
+func NotFoundHandler(w http.ResponseWriter, r *http.Request) {
+
+	http.ServeFile(w, r, "./assets/index.html")
 }

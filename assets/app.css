@@ -1,0 +1,11 @@
+.running{
+    color: aquamarine;
+    background-color: chartreuse;
+}
+
+.component{
+    border: 1px black solid;
+    padding-left: 35px;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+}

@@ -1,0 +1,33 @@
+<html>
+    <head>
+        <title>Cluster Test</title>
+        <link href="app.css" rel="stylesheet" type="text/css">
+    </head>
+<body>
+    <h1>Cluster Test</h1>
+    <div id="app">
+
+        <div v-for="inst in instances">
+            <div class="component">
+                    <p>{{ inst.ID }} is: {{ inst.State }}</p>
+                    <p>Private IP: {{inst.PrivateIP}} </p>
+                    <p>Public IP: {{ inst.PublicIP }}</p>
+                    <p>Is Master? {{ inst.IsMaster }}</p>
+                    <div> 
+                        Route 53 bindings:
+                        <ul v-for="dns in inst.DNS">
+                            <li>{{ dns }} </li>
+                        </ul>
+                    </div>
+            </div>
+        
+        </div>        
+    </div>
+
+    
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.0"></script>
+<script src="app.js"></script>
+</html>
