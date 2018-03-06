@@ -17,8 +17,10 @@ package cmd
 import (
 	"fmt"
 	"math/rand"
+	"net/http"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 )
 
@@ -34,26 +36,69 @@ For example, the following command will list all the AWS resources that would
 be destroyed if it wasn't a dry-run:
 
 ~ cluster-test deleteNode --cluster barcelona --dry-run --all`,
-	Run: deleteNode,
+	Run: runNode,
 }
 
 func init() {
 	rootCmd.AddCommand(deleteNodeCmd)
 }
 
-func deleteNode(cmd *cobra.Command, args []string) {
+func runNode(cmd *cobra.Command, args []string) {
+	deleteNode()
+}
+
+func deleteNode() error {
+	deletedResources = nil
 	fmt.Printf("delete node from cluster %v", cluster)
-	initAWSSession()
-	nodes := getNodes(cluster)
+	nodes := GetNodes(cluster)
 	if all {
 		for _, n := range nodes {
-			deleteInstance(n)
+			d, err := deleteInstance(n)
+			if err != nil {
+				return err
+			}
+			if !stringInSlice(deletedResources, d) {
+				deletedResources = append(deletedResources, d)
+			}
 			time.Sleep(time.Duration(wait) * time.Second)
 		}
 	} else {
 		s := rand.NewSource(time.Now().Unix())
 		r := rand.New(s)
 		unluckyNode := nodes[r.Intn(len(nodes))]
-		deleteInstance(unluckyNode)
+		d, err := deleteInstance(unluckyNode)
+		if err != nil {
+			return err
+		}
+		if !stringInSlice(deletedResources, d) {
+			deletedResources = append(deletedResources, d)
+		}
 	}
+	return nil
+}
+
+// NodesHandler is the default route
+func NodesHandler(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	cluster = vars["cluster"]
+	if _, ok := vars["all"]; ok {
+		all = true
+	}
+	if debug {
+		fmt.Println("cmd.deleteNode.NodesHandler:")
+		fmt.Printf("cluster: %v/n", cluster)
+		fmt.Printf("all: %v/n", all)
+		fmt.Printf("dry-run: %v/n", dryrun)
+	}
+
+	err := deleteNode()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Error deleting AWS Resources: %v", deletedResources)
+	} else {
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintf(w, "AWS Resources deleted: %v", deletedResources)
+	}
+
 }

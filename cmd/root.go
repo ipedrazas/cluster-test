@@ -30,6 +30,9 @@ var all bool
 var cluster string
 var wait int
 var incluster bool
+var debug bool
+var version = "v0.1.0"
+var deletedResources []string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -55,7 +58,7 @@ var versionCmd = &cobra.Command{
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("cluster-test v0.1.0")
+		fmt.Printf("cluster-test %v/n", version)
 	},
 }
 
@@ -78,11 +81,13 @@ func init() {
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	rootCmd.PersistentFlags().BoolVar(&dryrun, "dry-run", false, "do a dry-run execution")
+	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "print debug statments")
 	rootCmd.PersistentFlags().BoolVar(&incluster, "in-cluster", false, "flag that indicates if the execution happens inside or outside a kubernetes cluster.")
 	rootCmd.PersistentFlags().BoolVar(&all, "all", false, "tries to delete all the resources")
 	rootCmd.PersistentFlags().StringVar(&cluster, "cluster", "c", "kubernetes cluster name")
 	rootCmd.PersistentFlags().IntVarP(&wait, "wait", "d", 0, "delay between deletion of resources")
 	rootCmd.AddCommand(versionCmd)
+
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -109,4 +114,13 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
+}
+
+func stringInSlice(list []string, a string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
 }

@@ -15,9 +15,12 @@
 package cmd
 
 import (
+	"fmt"
 	"math/rand"
+	"net/http"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -41,16 +44,14 @@ func init() {
 	rootCmd.AddCommand(deletePodCmd)
 	deletePodCmd.Flags().StringVarP(&filter, "filter", "f", "", "label selector to fetch pods. Format is: key=value")
 	deletePodCmd.Flags().StringVarP(&namespace, "namespace", "n", "default", "Namespace where the resources are located")
-	deletePodCmd.Flags().StringVarP(&namespace, "namespace", "n", "default", "Namespace where the resources are located")
+	if incluster {
+		config = inCluster()
+	} else {
+		config = outCluster()
+	}
 }
 
 func podsHandler(cmd *cobra.Command, args []string) {
-	if incluster {
-		config = inCluster()
-	}else{
-		config = outCluster()
-	}
-	
 	pods := getPods()
 	deletePod(pods)
 }
@@ -68,7 +69,7 @@ func getPods() []string {
 }
 
 func deletePod(podNames []string) error {
-
+	deletedResources = nil
 	if all {
 		for _, n := range podNames {
 			deleteResource(n)
@@ -89,6 +90,31 @@ func deleteResource(podName string) error {
 	if err != nil {
 		panic(err.Error())
 	}
+	if !stringInSlice(deletedResources, podName) {
+		deletedResources = append(deletedResources, podName)
+	}
 	err = clientset.CoreV1().Pods(namespace).Delete(podName, &metav1.DeleteOptions{})
 	return err
+}
+
+// PodsHandler is the default route
+func PodsHandler(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	namespace = vars["namespace"]
+	filter = vars["filter"]
+
+	if debug {
+		fmt.Println("cmd.deletePod.PodsHandler:")
+		fmt.Printf("Namespace: %v/n", namespace)
+		fmt.Printf("Filter: %v/n", filter)
+		fmt.Printf("dry-run: %v/n", dryrun)
+	}
+
+	pods := getPods()
+	deletePod(pods)
+
+	w.WriteHeader(http.StatusOK)
+
+	fmt.Fprintf(w, "Resources deleted: %v", deletedResources)
 }

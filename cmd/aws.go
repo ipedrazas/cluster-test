@@ -18,12 +18,18 @@ func initAWSSession() {
 
 }
 
-func getMasters(clusterName string) []string {
+// GetMasters receives a parameter (clusterName) that is used to query
+// AWS to get the instanceID.
+func GetMasters(clusterName string) []string {
+	initAWSSession()
 	resources := getInstances(clusterName, "masters")
 	return resources
 }
 
-func getNodes(clusterName string) []string {
+// GetMasters receives a parameter (clusterName) that is used to query
+// AWS to get the instanceID.
+func GetNodes(clusterName string) []string {
+	initAWSSession()
 	resources := getInstances(clusterName, "nodes")
 	return resources
 }
@@ -61,16 +67,17 @@ func getInstances(clusterName string, role string) []string {
 	return resources
 }
 
-func deleteInstance(instanceID string) error {
-	fmt.Printf("Deleting EC2 instance %v - dry-run: %v\n", instanceID, dryrun)
+func deleteInstance(instanceID string) (string, error) {
+	res := fmt.Sprintf("Deleting EC2 instance %v - dry-run: %v\n", instanceID, dryrun)
 	if !dryrun {
 		request := &ec2.TerminateInstancesInput{
 			InstanceIds: []*string{&instanceID},
 		}
 		_, err := svc.TerminateInstances(request)
 		if err != nil {
-			return fmt.Errorf("error deleting instance %q: %v", instanceID, err)
+			return fmt.Sprintf("error deleting instance %q", instanceID), err
 		}
 	}
-	return nil
+
+	return res, nil
 }

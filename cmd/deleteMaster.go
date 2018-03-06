@@ -17,8 +17,10 @@ package cmd
 import (
 	"fmt"
 	"math/rand"
+	"net/http"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 )
 
@@ -34,7 +36,7 @@ For example, the following command will list all the AWS resources that would
 be destroyed if it wasn't a dry-run:
 
 ~ cluster-test deleteMaster --cluster barcelona --dry-run --all`,
-	Run: deleteMaster,
+	Run: runMaster,
 }
 
 func init() {
@@ -42,20 +44,62 @@ func init() {
 
 }
 
-func deleteMaster(cmd *cobra.Command, args []string) {
+func runMaster(cmd *cobra.Command, args []string) {
+	deleteMaster()
+}
+
+func deleteMaster() error {
+	deletedResources = nil
 	fmt.Printf("delete master from cluster %v", cluster)
-	initAWSSession()
-	masters := getMasters(cluster)
+	masters := GetMasters(cluster)
 	if all {
 		for _, m := range masters {
-			deleteInstance(m)
+			d, err := deleteInstance(m)
+			if err != nil {
+				return err
+			}
+			if !stringInSlice(deletedResources, d) {
+				deletedResources = append(deletedResources, d)
+			}
 			time.Sleep(time.Duration(wait) * time.Second)
 		}
 	} else {
 		s := rand.NewSource(time.Now().Unix())
 		r := rand.New(s)
 		unluckyMaster := masters[r.Intn(len(masters))]
-		deleteInstance(unluckyMaster)
-
+		d, err := deleteInstance(unluckyMaster)
+		if err != nil {
+			return err
+		}
+		if !stringInSlice(deletedResources, d) {
+			deletedResources = append(deletedResources, d)
+		}
 	}
+	return nil
+}
+
+// MastersHandler is the default route
+func MastersHandler(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	cluster = vars["cluster"]
+	if _, ok := vars["all"]; ok {
+		all = true
+	}
+	if debug {
+		fmt.Println("cmd.deleteMaster.MastersHandler:")
+		fmt.Printf("cluster: %v/n", cluster)
+		fmt.Printf("all: %v/n", all)
+		fmt.Printf("dry-run: %v/n", dryrun)
+	}
+
+	err := deleteMaster()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Error deleting AWS Resources: %v", deletedResources)
+	} else {
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintf(w, "AWS Resources deleted: %v", deletedResources)
+	}
+
 }
