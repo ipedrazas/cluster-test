@@ -7,7 +7,7 @@ var app = new Vue({
     },
     methods: {
       getData() {
-        var route = '/check/master/cerdanyola.k8s.sandbox.nutmeg.co.uk';
+        var route = '/check/master/vic.k8s.sandbox.nutmeg.co.uk';
         this.$http.get(route).then(response => {
 
             // get body data

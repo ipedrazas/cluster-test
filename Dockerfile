@@ -3,7 +3,6 @@ WORKDIR /go/src/github.com/ipedrazas/cluster-test
 COPY . .
 RUN go get
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app .
-RUN CGO_ENABLED=0 go build -ldflags -linkmode external -extldflags -static -s -o app .
 
 FROM scratch
 COPY --from=builder /go/src/github.com/ipedrazas/cluster-test/app /app

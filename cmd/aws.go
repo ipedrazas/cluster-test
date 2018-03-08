@@ -21,6 +21,7 @@ func initAWSSession() {
 
 }
 
+// GetAllInstances returns EC2 instances
 func GetAllInstances() []Instance {
 	initAWSSession()
 	filter := []*ec2.Filter{
@@ -46,12 +47,13 @@ func GetMasters() []Instance {
 			},
 		},
 		{
-			Name: aws.String("k8s.io/role/master"),
+			Name: aws.String("tag:k8s.io/role/master"),
 			Values: []*string{
 				aws.String(strings.Join([]string{"*", "1", "*"}, "")),
 			},
 		},
 	}
+
 	resources := getInstances(filter)
 	return resources
 }
@@ -68,7 +70,7 @@ func GetNodes() []Instance {
 			},
 		},
 		{
-			Name: aws.String("k8s.io/role/node"),
+			Name: aws.String("tag:k8s.io/role/node"),
 			Values: []*string{
 				aws.String(strings.Join([]string{"*", "1", "*"}, "")),
 			},
@@ -79,6 +81,9 @@ func GetNodes() []Instance {
 }
 
 func getInstances(filters []*ec2.Filter) []Instance {
+	if debug {
+		fmt.Println(filters)
+	}
 	params := &ec2.DescribeInstancesInput{
 		Filters: filters,
 	}
@@ -92,16 +97,20 @@ func getInstances(filters []*ec2.Filter) []Instance {
 
 		for _, instance := range reservation.Instances {
 			i := &Instance{
-				ID:         *instance.InstanceId,
-				Name:       *instance.KeyName,
-				PrivateIP:  *instance.PrivateIpAddress,
+				ID:   *instance.InstanceId,
+				Name: *instance.KeyName,
+
 				LaunchTime: *instance.LaunchTime,
 				State:      *instance.State.Name,
 			}
-			// check if instance has public IP
+			// check if instance has IPs
 			if instance.PublicIpAddress != nil {
 				i.PublicIP = *instance.PublicIpAddress
 			}
+			if instance.PrivateIpAddress != nil {
+				i.PrivateIP = *instance.PrivateIpAddress
+			}
+
 			for _, t := range instance.Tags {
 				if *t.Key == "k8s.io/role/master" {
 					i.IsMaster = true
@@ -124,6 +133,7 @@ func deleteInstance(instanceID string) (string, error) {
 		if err != nil {
 			return fmt.Sprintf("error deleting instance %q", instanceID), err
 		}
+
 	}
 
 	return res, nil

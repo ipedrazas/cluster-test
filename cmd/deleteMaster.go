@@ -50,10 +50,18 @@ func runMaster(cmd *cobra.Command, args []string) {
 
 func deleteMaster() error {
 	deletedResources = nil
-	fmt.Printf("delete master from cluster %v", cluster)
+	if debug {
+		fmt.Println("cmd.deleteMaster.deleteMaster:")
+		fmt.Printf("cluster: %v/n", cluster)
+		fmt.Printf("all: %v/n", all)
+		fmt.Printf("dry-run: %v/n", dryrun)
+	}
 	masters := GetMasters()
 	if all {
 		for _, m := range masters {
+			if debug {
+				fmt.Printf("Delete EC2 Instance: %v\n ", m.ID)
+			}
 			d, err := deleteInstance(m.ID)
 			if err != nil {
 				return err
@@ -67,6 +75,9 @@ func deleteMaster() error {
 		s := rand.NewSource(time.Now().Unix())
 		r := rand.New(s)
 		unluckyMaster := masters[r.Intn(len(masters))]
+		if debug {
+			fmt.Printf("Delete EC2 Instance: %v\n ", unluckyMaster.ID)
+		}
 		d, err := deleteInstance(unluckyMaster.ID)
 		if err != nil {
 			return err
@@ -86,13 +97,6 @@ func MastersHandler(w http.ResponseWriter, r *http.Request) {
 	if _, ok := vars["all"]; ok {
 		all = true
 	}
-	if debug {
-		fmt.Println("cmd.deleteMaster.MastersHandler:")
-		fmt.Printf("cluster: %v/n", cluster)
-		fmt.Printf("all: %v/n", all)
-		fmt.Printf("dry-run: %v/n", dryrun)
-	}
-
 	err := deleteMaster()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
