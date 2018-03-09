@@ -50,7 +50,7 @@ func runNode(cmd *cobra.Command, args []string) {
 func deleteNode() error {
 	deletedResources = nil
 	fmt.Printf("delete node from cluster %v", cluster)
-	nodes := GetNodes()
+	nodes := GetRunningInstances(GetNodes())
 	if all {
 		for _, n := range nodes {
 			d, err := deleteInstance(n.ID)

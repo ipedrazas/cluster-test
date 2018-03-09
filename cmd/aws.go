@@ -35,7 +35,18 @@ func GetAllInstances() []Instance {
 	return getInstances(filter)
 }
 
-// GetMasters receives a parameter (clusterName) that is used to query
+// GetRunningMasters get all the masters and filters out the ones that are not running
+func GetRunningInstances(ins []Instance) []Instance {
+	var rIns []Instance
+	for _, m := range ins {
+		if m.State != "Running" {
+			rIns = append(rIns, m)
+		}
+	}
+	return rIns
+}
+
+// GetMasters uses clusterName to query
 // AWS to get the instanceID.
 func GetMasters() []Instance {
 	initAWSSession()

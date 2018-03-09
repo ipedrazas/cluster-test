@@ -3,11 +3,29 @@ var app = new Vue({
     data: {
     //   message: 'Hello',
       instances: [{ID: '123', Status: 'runnning'}],
-      cluster: ""
+      clusterName: "",
+      cluster: "",
     },
     methods: {
       getData() {
-        var route = '/check/master/vic.k8s.sandbox.nutmeg.co.uk';
+
+        var route = '/check/master/' + this.clusterName + ".k8s.sandbox.nutmeg.co.uk";
+        this.$http.get(route).then(response => {
+
+            // get body data
+            // self.instances = response.body.Instances;
+            console.log(response.body.Instances);
+            
+            app.instances = response.body.Instances;
+            app.cluster = response.body.Cluster;
+        
+          }, response => {
+              
+          });
+      },
+      deleteMaster(){
+          // r.HandleFunc("/master/{cluster}/{all}", MastersHandler)
+          var route = '/master/' + this.clusterName + '/';
         this.$http.get(route).then(response => {
 
             // get body data
@@ -23,17 +41,7 @@ var app = new Vue({
       }
     },
     created: function(){
-        this.getData();
+        // this.getData();
     },
 });
 
-
-var example1 = new Vue({
-    el: '#example-1',
-    data: {
-      items: [
-        { message: 'Foo' },
-        { message: 'Bar' }
-      ]
-    }
-  })

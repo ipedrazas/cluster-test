@@ -56,7 +56,7 @@ func deleteMaster() error {
 		fmt.Printf("all: %v/n", all)
 		fmt.Printf("dry-run: %v/n", dryrun)
 	}
-	masters := GetMasters()
+	masters := GetRunningInstances(GetMasters())
 	if all {
 		for _, m := range masters {
 			if debug {

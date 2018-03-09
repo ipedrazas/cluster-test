@@ -25,3 +25,20 @@
     padding: 5px;
     text-transform: capitalize;
 }
+
+
+.shutting-down{
+    color: #a00505;
+    font-weight: bold;
+    background-color: #e89e9e;
+    padding: 5px;
+    text-transform: capitalize;
+}
+
+.terminated{
+    color: #bb7205;
+    font-weight: bold;
+    background-color: #daa4539e;
+    padding: 5px;
+    text-transform: capitalize;
+}
