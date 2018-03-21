@@ -1,3 +1,3 @@
 # cluster-test
 
-Application to test cluster configurations and cluster recoveries.
+Application to test cluster configurations and cluster recoveries in AWS.
